@@ -1,0 +1,202 @@
+{
+  "version": "2",
+  "templates": [
+    {
+      "type": 3,
+      "title": "StreamLeads - Sistema de Automação de Leads",
+      "description": "Sistema completo de automação de leads com API REST, Dashboard interativo, integração WhatsApp/Telegram e sistema de scoring automático.",
+      "note": "<p>StreamLeads é uma solução completa para automação de leads que inclui:</p><ul><li>API REST para gestão de leads</li><li>Dashboard interativo com Streamlit</li><li>Integração com WhatsApp e Telegram</li><li>Sistema de scoring automático</li><li>Backup automático opcional</li><li>Monitoramento com Prometheus/Grafana</li></ul><p><strong>Portas expostas:</strong></p><ul><li>8000: API REST</li><li>8501: Dashboard</li><li>80/443: Nginx (proxy reverso)</li><li>9090: Prometheus (opcional)</li><li>3000: Grafana (opcional)</li></ul>",
+      "categories": ["CRM", "Automation", "Lead Management"],
+      "platform": "linux",
+      "logo": "https://raw.githubusercontent.com/brunopirz/streamleads/main/docs/logo.png",
+      "repository": {
+        "url": "https://github.com/brunopirz/streamleads",
+        "stackfile": "docker-compose.portainer.yml"
+      },
+      "env": [
+        {
+          "name": "APP_NAME",
+          "label": "Nome da Aplicação",
+          "description": "Nome da aplicação StreamLeads",
+          "default": "StreamLeads"
+        },
+        {
+          "name": "APP_ENV",
+          "label": "Ambiente",
+          "description": "Ambiente de execução (development, staging, production)",
+          "default": "production",
+          "select": [
+            {
+              "text": "Produção",
+              "value": "production",
+              "default": true
+            },
+            {
+              "text": "Staging",
+              "value": "staging"
+            },
+            {
+              "text": "Desenvolvimento",
+              "value": "development"
+            }
+          ]
+        },
+        {
+          "name": "DEBUG",
+          "label": "Modo Debug",
+          "description": "Habilitar modo debug (apenas para desenvolvimento)",
+          "default": "false",
+          "select": [
+            {
+              "text": "Desabilitado",
+              "value": "false",
+              "default": true
+            },
+            {
+              "text": "Habilitado",
+              "value": "true"
+            }
+          ]
+        },
+        {
+          "name": "SECRET_KEY",
+          "label": "Chave Secreta",
+          "description": "Chave secreta para criptografia (mínimo 32 caracteres)",
+          "default": ""
+        },
+        {
+          "name": "POSTGRES_DB",
+          "label": "Nome do Banco de Dados",
+          "description": "Nome do banco de dados PostgreSQL",
+          "default": "streamleads"
+        },
+        {
+          "name": "POSTGRES_USER",
+          "label": "Usuário do Banco",
+          "description": "Usuário do banco de dados PostgreSQL",
+          "default": "streamleads"
+        },
+        {
+          "name": "POSTGRES_PASSWORD",
+          "label": "Senha do Banco",
+          "description": "Senha do banco de dados PostgreSQL (use uma senha forte)",
+          "default": ""
+        },
+        {
+          "name": "DATABASE_URL",
+          "label": "URL do Banco de Dados",
+          "description": "URL completa de conexão com o banco de dados",
+          "default": "postgresql://streamleads:senha_segura@db:5432/streamleads"
+        },
+        {
+          "name": "REDIS_URL",
+          "label": "URL do Redis",
+          "description": "URL de conexão com o Redis",
+          "default": "redis://redis:6379/0"
+        },
+        {
+          "name": "SMTP_HOST",
+          "label": "Servidor SMTP",
+          "description": "Servidor SMTP para envio de emails (opcional)",
+          "default": "smtp.gmail.com"
+        },
+        {
+          "name": "SMTP_PORT",
+          "label": "Porta SMTP",
+          "description": "Porta do servidor SMTP",
+          "default": "587"
+        },
+        {
+          "name": "SMTP_USER",
+          "label": "Usuário SMTP",
+          "description": "Usuário para autenticação SMTP (opcional)",
+          "default": ""
+        },
+        {
+          "name": "SMTP_PASSWORD",
+          "label": "Senha SMTP",
+          "description": "Senha para autenticação SMTP (opcional)",
+          "default": ""
+        },
+        {
+          "name": "SMTP_FROM",
+          "label": "Email Remetente",
+          "description": "Email remetente para notificações (opcional)",
+          "default": ""
+        },
+        {
+          "name": "WHATSAPP_API_TOKEN",
+          "label": "Token WhatsApp API",
+          "description": "Token da API do WhatsApp para integração (opcional)",
+          "default": ""
+        },
+        {
+          "name": "TELEGRAM_BOT_TOKEN",
+          "label": "Token Bot Telegram",
+          "description": "Token do bot do Telegram para integração (opcional)",
+          "default": ""
+        },
+        {
+          "name": "SENTRY_DSN",
+          "label": "Sentry DSN",
+          "description": "DSN do Sentry para monitoramento de erros (opcional)",
+          "default": ""
+        },
+        {
+          "name": "BACKUP_SCHEDULE",
+          "label": "Agendamento de Backup",
+          "description": "Cron schedule para backup automático (formato: min hora dia mês dia_semana)",
+          "default": "0 2 * * *"
+        },
+        {
+          "name": "GRAFANA_PASSWORD",
+          "label": "Senha Admin Grafana",
+          "description": "Senha do usuário admin do Grafana (apenas se usar monitoramento)",
+          "default": "admin"
+        }
+      ],
+      "volumes": [
+        {
+          "container": "/var/lib/postgresql/data",
+          "bind": "postgres_data"
+        },
+        {
+          "container": "/data",
+          "bind": "redis_data"
+        },
+        {
+          "container": "/app/data",
+          "bind": "app_data"
+        },
+        {
+          "container": "/app/logs",
+          "bind": "app_logs"
+        },
+        {
+          "container": "/var/log/nginx",
+          "bind": "nginx_logs"
+        },
+        {
+          "container": "/backup",
+          "bind": "backup_data"
+        },
+        {
+          "container": "/prometheus",
+          "bind": "prometheus_data"
+        },
+        {
+          "container": "/var/lib/grafana",
+          "bind": "grafana_data"
+        }
+      ],
+      "ports": [
+        "8000:8000/tcp",
+        "8501:8501/tcp",
+        "80:80/tcp",
+        "443:443/tcp",
+        "9090:9090/tcp",
+        "3000:3000/tcp"
+      ]
+    }
+  ]
+}

@@ -37,9 +37,33 @@ Sistema completo para receber, processar e qualificar leads automaticamente de m
 - Docker e Docker Compose
 - Git
 
-### 1. Clone o Repositório
+### 🐳 Instalação via Portainer (Recomendado)
+
+Para instalação rápida e fácil usando Portainer:
+
+1. **Acesse seu Portainer**
+2. **Vá em Stacks > Add stack**
+3. **Configure a stack**:
+   - Nome: `streamleads`
+   - Repositório: `https://github.com/brunopirz/streamleads.git`
+   - Arquivo: `docker-compose.portainer.yml`
+4. **Configure as variáveis de ambiente** (veja [documentação completa](./documentacao/instalacao-portainer.md))
+5. **Deploy da stack**
+
+**Configuração Automática:**
 ```bash
-git clone <repository-url>
+# Linux/Mac
+./scripts/setup-portainer.sh
+
+# Windows
+.\scripts\setup-portainer.ps1
+```
+
+📚 **Documentação completa**: [Instalação no Portainer](./documentacao/instalacao-portainer.md)
+
+### 1. Clone o Repositório (Instalação Manual)
+```bash
+git clone https://github.com/brunopirz/streamleads.git
 cd StreamLeads
 ```
 
