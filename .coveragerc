@@ -1,0 +1,237 @@
+# Configuração de cobertura de código para o projeto StreamLeads
+
+[run]
+# Fonte dos arquivos para análise de cobertura
+source = app
+
+# Incluir apenas arquivos Python
+include = 
+    app/*
+    app/**/*
+
+# Excluir arquivos específicos
+omit = 
+    */tests/*
+    */test_*
+    */*_test.py
+    */conftest.py
+    */migrations/*
+    */alembic/*
+    */venv/*
+    */env/*
+    */.venv/*
+    */site-packages/*
+    */dist-packages/*
+    */__pycache__/*
+    */build/*
+    */dist/*
+    */setup.py
+    */manage.py
+    app/main.py
+    app/config.py
+    app/__init__.py
+    app/database.py
+    scripts/*
+    dashboard/*
+
+# Configurações de execução
+branch = True
+parallel = True
+concurrency = multiprocessing
+
+# Configuração de contexto
+context = ${COVERAGE_CONTEXT}
+
+# Configuração de dados
+data_file = .coverage
+
+# Configuração de plugins
+plugins = 
+
+# Configuração de debug
+debug = 
+
+# Configuração de warnings
+disable_warnings = 
+    no-data-collected
+    module-not-imported
+
+# Configuração de timid
+timid = False
+
+# Configuração de skip covered
+skip_covered = False
+
+# Configuração de skip empty
+skip_empty = False
+
+[report]
+# Configurações de relatório
+
+# Excluir linhas específicas dos relatórios
+exclude_lines =
+    # Pragmas padrão
+    pragma: no cover
+    pragma: nocover
+    
+    # Não cobrir linhas de debug
+    def __repr__
+    if self\.debug:
+    
+    # Não cobrir raises
+    raise AssertionError
+    raise NotImplementedError
+    
+    # Não cobrir condições de debug
+    if 0:
+    if __name__ == .__main__.:
+    if TYPE_CHECKING:
+    
+    # Não cobrir imports condicionais
+    if sys.version_info
+    
+    # Não cobrir abstract methods
+    @(abc\.)?abstractmethod
+    
+    # Não cobrir ellipsis
+    \.\.\.
+    
+    # Não cobrir pass statements
+    pass
+    
+    # Não cobrir logging statements
+    logger\.
+    log\.
+    
+    # Não cobrir exception handling sem ação
+    except.*:
+        pass
+    except.*:
+        continue
+    except.*:
+        return
+    
+    # Não cobrir type checking
+    if typing.TYPE_CHECKING:
+    
+    # Não cobrir platform specific code
+    if platform.system
+    
+    # Não cobrir version specific code
+    if sys.version
+
+# Ignorar erros
+ignore_errors = True
+
+# Incluir arquivos específicos no relatório
+include = 
+    app/*
+
+# Omitir arquivos específicos do relatório
+omit = 
+    */tests/*
+    */test_*
+    */*_test.py
+    */conftest.py
+    */migrations/*
+    */alembic/*
+    */venv/*
+    */env/*
+    */.venv/*
+    */site-packages/*
+    */dist-packages/*
+    */__pycache__/*
+    */build/*
+    */dist/*
+    */setup.py
+    app/main.py
+    app/config.py
+    app/__init__.py
+    scripts/*
+    dashboard/*
+
+# Configuração de precisão
+precision = 2
+
+# Mostrar linhas perdidas
+show_missing = True
+
+# Pular arquivos cobertos
+skip_covered = False
+
+# Pular arquivos vazios
+skip_empty = True
+
+# Ordenação
+sort = Cover
+
+# Configuração de falha
+fail_under = 80
+
+[html]
+# Configurações de relatório HTML
+
+# Diretório de saída
+directory = htmlcov
+
+# Título do relatório
+title = StreamLeads - Cobertura de Código
+
+# Mostrar contextos
+show_contexts = True
+
+# Pular arquivos cobertos
+skip_covered = False
+
+# Pular arquivos vazios
+skip_empty = True
+
+# Configuração de CSS extra
+extra_css = 
+
+[xml]
+# Configurações de relatório XML
+
+# Arquivo de saída
+output = coverage.xml
+
+# Configuração de package depth
+package_depth = 99
+
+[json]
+# Configurações de relatório JSON
+
+# Arquivo de saída
+output = coverage.json
+
+# Mostrar contextos
+show_contexts = True
+
+# Pretty print
+pretty_print = True
+
+[lcov]
+# Configurações de relatório LCOV
+
+# Arquivo de saída
+output = coverage.lcov
+
+[paths]
+# Mapeamento de caminhos para diferentes ambientes
+
+source =
+    app/
+    */site-packages/app/
+    */dist-packages/app/
+    /app/
+    C:\*\app\
+    \app\
+
+[combine]
+# Configurações para combinar dados de cobertura
+
+# Configuração de parallel
+parallel = True
+
+# Configuração de strict
+strict = True

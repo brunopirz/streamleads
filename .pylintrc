@@ -1,0 +1,341 @@
+# Configuração do Pylint para o projeto StreamLeads
+
+[MASTER]
+# Lista de plugins a serem carregados
+load-plugins=pylint_django,pylint_celery
+
+# Usar múltiplos processos para acelerar o Pylint
+jobs=0
+
+# Permitir carregamento de extensões C arbitrárias
+unsafe-load-any-extension=no
+
+# Lista de arquivos ou diretórios a serem ignorados
+ignore=migrations,alembic,__pycache__,.git,.tox,build,dist,*.egg
+
+# Padrões de arquivos a serem ignorados
+ignore-patterns=test_.*,.*_test.py,conftest.py
+
+# Arquivos ou diretórios a serem ignorados persistentemente
+persistent=yes
+
+# Diretório de cache
+cache-size=500
+
+# Extensões de arquivos a serem analisadas
+py-version=3.11
+
+[MESSAGES CONTROL]
+# Desabilitar mensagens específicas
+disable=
+    # Imports
+    import-error,
+    no-name-in-module,
+    
+    # Docstrings
+    missing-module-docstring,
+    missing-class-docstring,
+    missing-function-docstring,
+    
+    # Formatação (delegada ao Black)
+    line-too-long,
+    bad-continuation,
+    
+    # Convenções que podem ser muito restritivas
+    too-few-public-methods,
+    too-many-arguments,
+    too-many-locals,
+    too-many-branches,
+    too-many-statements,
+    too-many-instance-attributes,
+    
+    # Django específico
+    django-not-configured,
+    
+    # Outros
+    fixme,
+    broad-except,
+    global-statement,
+    attribute-defined-outside-init,
+    protected-access,
+    abstract-method,
+    unused-wildcard-import,
+    wildcard-import,
+    
+    # Celery específico
+    abstract-class-instantiated,
+    
+    # Type hints
+    unsubscriptable-object,
+    unsupported-binary-operation,
+    
+    # Logging
+    logging-fstring-interpolation,
+    
+    # Outros warnings menores
+    consider-using-f-string,
+    consider-using-with,
+    use-dict-literal,
+    use-list-literal
+
+# Habilitar mensagens específicas
+enable=
+    useless-suppression,
+    deprecated-pragma,
+    use-symbolic-message-instead
+
+[REPORTS]
+# Formato de saída
+output-format=text
+
+# Incluir IDs de mensagem na saída
+include-ids=yes
+
+# Incluir símbolos de mensagem na saída
+include-symbols=yes
+
+# Template para relatórios
+msg-template={path}:{line}:{column}: {msg_id}: {msg} ({symbol})
+
+# Relatórios a serem gerados
+reports=no
+
+# Avaliação de pontuação
+score=yes
+
+[REFACTORING]
+# Número máximo de argumentos para função/método
+max-args=7
+
+# Número máximo de atributos para uma classe
+max-attributes=10
+
+# Número máximo de branches em uma função/método
+max-branches=15
+
+# Número máximo de locals em uma função/método
+max-locals=20
+
+# Número máximo de parents para uma classe
+max-parents=7
+
+# Número máximo de métodos públicos para uma classe
+max-public-methods=25
+
+# Número máximo de returns em uma função/método
+max-returns=6
+
+# Número máximo de statements em uma função/método
+max-statements=50
+
+# Número mínimo de métodos públicos para uma classe
+min-public-methods=1
+
+[BASIC]
+# Convenções de nomenclatura
+
+# Argumentos
+argument-naming-style=snake_case
+argument-rgx=[a-z_][a-z0-9_]{2,30}$
+
+# Atributos
+attr-naming-style=snake_case
+attr-rgx=[a-z_][a-z0-9_]{2,30}$
+
+# Classes
+class-naming-style=PascalCase
+class-rgx=[A-Z_][a-zA-Z0-9]+$
+
+# Constantes
+const-naming-style=UPPER_CASE
+const-rgx=(([A-Z_][A-Z0-9_]*)|(__.*__))$
+
+# Funções
+function-naming-style=snake_case
+function-rgx=[a-z_][a-z0-9_]{2,30}$
+
+# Métodos
+method-naming-style=snake_case
+method-rgx=[a-z_][a-z0-9_]{2,30}$
+
+# Módulos
+module-naming-style=snake_case
+module-rgx=(([a-z_][a-z0-9_]*)|([A-Z][a-zA-Z0-9]+))$
+
+# Variáveis
+variable-naming-style=snake_case
+variable-rgx=[a-z_][a-z0-9_]{2,30}$
+
+# Variáveis inline
+inlinevar-naming-style=any
+inlinevar-rgx=[A-Za-z_][A-Za-z0-9_]*$
+
+# Nomes bons
+good-names=i,j,k,ex,Run,_,id,db,pk,ok
+
+# Nomes ruins
+bad-names=foo,bar,baz,toto,tutu,tata
+
+# Incluir dica de nome
+include-naming-hint=yes
+
+# Docstrings obrigatórias
+no-docstring-rgx=^_
+
+# Comprimento mínimo de nome
+min-name-length=2
+
+# Comprimento máximo de nome
+max-name-length=30
+
+[FORMAT]
+# Número máximo de caracteres em uma linha
+max-line-length=88
+
+# Ignorar linhas longas em URLs ou paths
+ignore-long-lines=^\s*(# )?<?https?://\S+>?$
+
+# Número máximo de linhas em um módulo
+max-module-lines=1000
+
+# String usada para indentação
+indent-string='    '
+
+# Número de espaços de indentação
+indent-after-paren=4
+
+# Permitir uso de tabs
+indent-tabs=no
+
+[LOGGING]
+# Formato de logging
+logging-format-style=new
+
+# Módulos de logging
+logging-modules=logging,loguru
+
+[MISCELLANEOUS]
+# Lista de tags de nota a serem consideradas
+notes=FIXME,XXX,TODO,BUG,HACK
+
+[SIMILARITIES]
+# Número mínimo de linhas similares
+min-similarity-lines=4
+
+# Ignorar comentários ao computar similaridades
+ignore-comments=yes
+
+# Ignorar docstrings ao computar similaridades
+ignore-docstrings=yes
+
+# Ignorar imports ao computar similaridades
+ignore-imports=no
+
+[SPELLING]
+# Dicionário de ortografia
+spelling-dict=
+
+# Lista de palavras conhecidas
+spelling-private-dict-file=
+
+# Armazenar palavras desconhecidas
+spelling-store-unknown-words=no
+
+[TYPECHECK]
+# Lista de decoradores que produzem contextos válidos
+contextmanager-decorators=contextlib.contextmanager
+
+# Lista de membros que são definidos dinamicamente
+generated-members=
+
+# Ignorar imports ausentes
+ignore-missing=yes
+
+# Lista de nomes de classe para os quais member attributes não devem ser verificados
+ignored-classes=optparse.Values,thread._local,_thread._local
+
+# Lista de módulos para os quais não há stub files disponíveis
+ignored-modules=
+
+# Mostrar uma dica para o nome correto
+include-naming-hint=yes
+
+# Lista de decoradores que mudam a assinatura de uma função decorada
+signature-mutators=
+
+[VARIABLES]
+# Lista de strings adicionais que são permitidas em __all__
+additional-builtins=
+
+# Lista de callbacks que são permitidos para redefinirem uma variável
+callbacks=cb_,_cb
+
+# Lista de nomes de variáveis dummy
+dummy-variables-rgx=_+$|(_[a-zA-Z0-9_]*[a-zA-Z0-9]+?$)|dummy|^ignored_|^unused_
+
+# Ignorar argumentos não utilizados
+ignore-unused-arguments=yes
+
+# Argumentos init-import
+init-import=no
+
+# Lista de nomes qualificados que são permitidos para redefinirem um builtin
+redefining-builtins-modules=six.moves,past.builtins,future.builtins,builtins,io
+
+[CLASSES]
+# Lista de nomes de método que são permitidos para não terem self como primeiro argumento
+valid-classmethod-first-arg=cls
+
+# Lista de nomes de método que são permitidos para não terem cls como primeiro argumento
+valid-metaclass-classmethod-first-arg=cls
+
+# Lista de decoradores que definem propriedades
+property-classes=abc.abstractproperty
+
+# Lista de mixin class names
+mixin-class-rgx=.*[Mm]ixin
+
+[DESIGN]
+# Número máximo de argumentos para função/método
+max-args=7
+
+# Número máximo de atributos para uma classe
+max-attributes=10
+
+# Número máximo de branches em uma função/método
+max-branches=15
+
+# Número máximo de locals em uma função/método
+max-locals=20
+
+# Número máximo de parents para uma classe
+max-parents=7
+
+# Número máximo de métodos públicos para uma classe
+max-public-methods=25
+
+# Número máximo de returns em uma função/método
+max-returns=6
+
+# Número máximo de statements em uma função/método
+max-statements=50
+
+# Número mínimo de métodos públicos para uma classe
+min-public-methods=1
+
+[IMPORTS]
+# Criar um gráfico de dependências externas
+ext-import-graph=
+
+# Criar um gráfico de dependências internas
+int-import-graph=
+
+# Forçar importação de ordem alfabética
+known-standard-library=
+
+# Forçar importação de terceiros
+known-third-party=
+
+[EXCEPTIONS]
+# Exceções que irão emitir uma warning quando sendo capturadas
+overgeneral-exceptions=BaseException,Exception

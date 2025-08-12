@@ -1,0 +1,173 @@
+version: '3.8'
+
+services:
+  # Banco de dados PostgreSQL
+  db:
+    image: postgres:15-alpine
+    container_name: streamleads_db
+    environment:
+      POSTGRES_DB: streamleads
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres123
+      POSTGRES_HOST_AUTH_METHOD: trust
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts/init_db.sql:/docker-entrypoint-initdb.d/init_db.sql
+    networks:
+      - streamleads_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis para cache e filas
+  redis:
+    image: redis:7-alpine
+    container_name: streamleads_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - streamleads_network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    command: redis-server --appendonly yes
+
+  # API Backend
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: streamleads_api
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres123@db:5432/streamleads
+      - REDIS_URL=redis://redis:6379/0
+      - ENVIRONMENT=development
+      - API_HOST=0.0.0.0
+      - API_PORT=8000
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+      - ./logs:/app/logs
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - streamleads_network
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Dashboard Streamlit
+  dashboard:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: streamleads_dashboard
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres123@db:5432/streamleads
+      - API_BASE_URL=http://api:8000
+      - STREAMLIT_SERVER_PORT=8501
+      - STREAMLIT_SERVER_ADDRESS=0.0.0.0
+    ports:
+      - "8501:8501"
+    volumes:
+      - .:/app
+    depends_on:
+      - api
+    networks:
+      - streamleads_network
+    command: streamlit run dashboard/main.py --server.port=8501 --server.address=0.0.0.0
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8501/_stcore/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Worker Celery para tarefas em background
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: streamleads_worker
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres123@db:5432/streamleads
+      - REDIS_URL=redis://redis:6379/0
+      - ENVIRONMENT=development
+    command: celery -A app.worker worker --loglevel=info
+    volumes:
+      - .:/app
+      - ./logs:/app/logs
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - streamleads_network
+
+  # Celery Beat para tarefas agendadas
+  beat:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: streamleads_beat
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres123@db:5432/streamleads
+      - REDIS_URL=redis://redis:6379/0
+      - ENVIRONMENT=development
+    command: celery -A app.worker beat --loglevel=info
+    volumes:
+      - .:/app
+      - ./logs:/app/logs
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - streamleads_network
+
+  # Flower para monitoramento do Celery
+  flower:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: streamleads_flower
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+    command: celery -A app.worker flower --port=5555
+    ports:
+      - "5555:5555"
+    volumes:
+      - .:/app
+    depends_on:
+      - redis
+    networks:
+      - streamleads_network
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  streamleads_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16

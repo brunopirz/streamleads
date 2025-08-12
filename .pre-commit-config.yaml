@@ -1,0 +1,221 @@
+# Configuração do pre-commit para o projeto StreamLeads
+# Para instalar: pre-commit install
+# Para executar manualmente: pre-commit run --all-files
+
+repos:
+  # Hooks básicos do pre-commit
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      # Verificações básicas de arquivos
+      - id: trailing-whitespace
+        args: [--markdown-linebreak-ext=md]
+      - id: end-of-file-fixer
+      - id: check-yaml
+        args: [--allow-multiple-documents]
+      - id: check-toml
+      - id: check-json
+      - id: check-xml
+      - id: check-merge-conflict
+      - id: check-case-conflict
+      - id: check-symlinks
+      - id: check-executables-have-shebangs
+      - id: check-shebang-scripts-are-executable
+      
+      # Verificações de Python
+      - id: check-ast
+      - id: check-builtin-literals
+      - id: check-docstring-first
+      - id: debug-statements
+      - id: name-tests-test
+        args: [--pytest-test-first]
+      
+      # Verificações de arquivos grandes
+      - id: check-added-large-files
+        args: [--maxkb=1000]
+      
+      # Verificações de credenciais
+      - id: detect-private-key
+      - id: detect-aws-credentials
+        args: [--allow-missing-credentials]
+      
+      # Formatação de arquivos
+      - id: pretty-format-json
+        args: [--autofix, --indent=2]
+      - id: mixed-line-ending
+        args: [--fix=lf]
+
+  # Black - Formatação de código Python
+  - repo: https://github.com/psf/black
+    rev: 23.7.0
+    hooks:
+      - id: black
+        language_version: python3
+        args: [--line-length=88, --target-version=py311]
+        exclude: ^(migrations/|alembic/versions/)
+
+  # isort - Organização de imports
+  - repo: https://github.com/pycqa/isort
+    rev: 5.12.0
+    hooks:
+      - id: isort
+        args: [--profile=black, --line-length=88]
+        exclude: ^(migrations/|alembic/versions/)
+
+  # flake8 - Linting de código Python
+  - repo: https://github.com/pycqa/flake8
+    rev: 6.0.0
+    hooks:
+      - id: flake8
+        args: 
+          - --max-line-length=88
+          - --extend-ignore=E203,W503,E501
+          - --max-complexity=10
+        exclude: ^(migrations/|alembic/versions/|__pycache__/)
+        additional_dependencies:
+          - flake8-docstrings
+          - flake8-import-order
+          - flake8-bugbear
+          - flake8-comprehensions
+          - flake8-simplify
+
+  # mypy - Verificação de tipos
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.5.1
+    hooks:
+      - id: mypy
+        args: [--ignore-missing-imports, --strict-optional]
+        exclude: ^(tests/|migrations/|alembic/versions/|scripts/)
+        additional_dependencies:
+          - types-requests
+          - types-python-dateutil
+          - types-redis
+          - types-PyYAML
+
+  # bandit - Verificação de segurança
+  - repo: https://github.com/pycqa/bandit
+    rev: 1.7.5
+    hooks:
+      - id: bandit
+        args: [-r, -f, json, -o, bandit-report.json]
+        exclude: ^(tests/|scripts/)
+
+  # safety - Verificação de vulnerabilidades em dependências
+  - repo: https://github.com/Lucas-C/pre-commit-hooks-safety
+    rev: v1.3.2
+    hooks:
+      - id: python-safety-dependencies-check
+        args: [--ignore=51668]
+
+  # pylint - Análise estática avançada
+  - repo: https://github.com/pycqa/pylint
+    rev: v3.0.0a7
+    hooks:
+      - id: pylint
+        args: 
+          - --rcfile=.pylintrc
+          - --disable=C0114,C0115,C0116  # Desabilitar warnings de docstring
+        exclude: ^(tests/|migrations/|alembic/versions/|scripts/)
+        additional_dependencies:
+          - pylint-django
+          - pylint-celery
+
+  # pydocstyle - Verificação de docstrings
+  - repo: https://github.com/pycqa/pydocstyle
+    rev: 6.3.0
+    hooks:
+      - id: pydocstyle
+        args: [--convention=google]
+        exclude: ^(tests/|migrations/|alembic/versions/|scripts/)
+
+  # autoflake - Remoção de imports não utilizados
+  - repo: https://github.com/pycqa/autoflake
+    rev: v2.2.0
+    hooks:
+      - id: autoflake
+        args:
+          - --in-place
+          - --remove-all-unused-imports
+          - --remove-unused-variables
+          - --remove-duplicate-keys
+          - --ignore-init-module-imports
+        exclude: ^(migrations/|alembic/versions/)
+
+  # pyupgrade - Atualização de sintaxe Python
+  - repo: https://github.com/asottile/pyupgrade
+    rev: v3.10.1
+    hooks:
+      - id: pyupgrade
+        args: [--py311-plus]
+        exclude: ^(migrations/|alembic/versions/)
+
+  # Verificação de requirements.txt
+  - repo: https://github.com/Lucas-C/pre-commit-hooks-nodejs
+    rev: v1.1.2
+    hooks:
+      - id: dockerfile_lint
+        files: Dockerfile.*
+
+  # Verificação de YAML
+  - repo: https://github.com/adrienverge/yamllint
+    rev: v1.32.0
+    hooks:
+      - id: yamllint
+        args: [-d, relaxed]
+
+  # Verificação de Markdown
+  - repo: https://github.com/igorshubovych/markdownlint-cli
+    rev: v0.35.0
+    hooks:
+      - id: markdownlint
+        args: [--fix]
+        exclude: ^(CHANGELOG.md)
+
+  # Verificação de secrets
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.4.0
+    hooks:
+      - id: detect-secrets
+        args: [--baseline, .secrets.baseline]
+        exclude: ^(tests/|.*\.lock$)
+
+  # Verificação de SQL
+  - repo: https://github.com/sqlfluff/sqlfluff
+    rev: 2.1.4
+    hooks:
+      - id: sqlfluff-lint
+        args: [--dialect, postgres]
+        files: \.sql$
+      - id: sqlfluff-fix
+        args: [--dialect, postgres]
+        files: \.sql$
+
+  # Verificação de Docker
+  - repo: https://github.com/hadolint/hadolint
+    rev: v2.12.0
+    hooks:
+      - id: hadolint-docker
+        args: [--ignore, DL3008, --ignore, DL3009]
+
+# Configuração global
+default_language_version:
+  python: python3.11
+
+default_stages: [commit, push]
+
+fail_fast: false
+
+minimum_pre_commit_version: 3.0.0
+
+# Configuração de CI
+ci:
+  autofix_commit_msg: |
+    [pre-commit.ci] auto fixes from pre-commit.com hooks
+    
+    for more information, see https://pre-commit.ci
+  autofix_prs: true
+  autoupdate_branch: ''
+  autoupdate_commit_msg: '[pre-commit.ci] pre-commit autoupdate'
+  autoupdate_schedule: weekly
+  skip: [pylint, mypy, bandit]  # Pular hooks pesados no CI
+  submodules: false
